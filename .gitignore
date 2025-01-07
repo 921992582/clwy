@@ -1,0 +1,16 @@
+we# Ignore Node.js files.
+/node_modules
+
+# Ignore environment files.
+/.env
+
+# Ignore editor files.
+/.idea
+/.vscode
+
+# Ignore system files.
+.DS_Store
+Thumbs.db
+
+# Ignore Docker data.
+/data
