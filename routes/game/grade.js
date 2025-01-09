@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {Game, GameUser, GameGrade,} = require('../../models');
 const {success, failure} = require('../../utils/responses');
-// const {NotFound} = require('http-errors');
+const {NotFound} = require('http-errors');
 
 
 /**
@@ -96,6 +96,12 @@ router.get('/', async function (req, res) {
         name: query.gameName
       }
     })
+    if (!IsExistGame) {
+      success(res, '游戏不存在', {}, 200)
+      return
+    }
+
+
     const gameList = await GameGrade.findAll({
       where: {
         gameId: IsExistGame.id
@@ -117,7 +123,7 @@ router.get('/', async function (req, res) {
       grade: item.grade,
       avatar: item.GameUser.avatar
     }));
-    success(res, '排行榜1', formattedRankList)
+    success(res, '查询成功', formattedRankList)
 
 
   } catch
