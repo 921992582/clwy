@@ -32,11 +32,14 @@ const adminChartsRouter = require('./routes/admin/charts');
 const adminAttachmentsRouter = require('./routes/admin/attachments');
 const adminAuthRouter = require('./routes/admin/auth');
 
+// 游戏路由
+const Game = require('./routes/game/grade');
+
 const app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -55,6 +58,8 @@ app.use('/auth', authRouter);
 app.use('/users', userAuth, usersRouter);
 app.use('/likes', userAuth, likesRouter);
 app.use('/uploads', userAuth, uploadsRouter);
+
+app.use('/game', Game);
 
 // 后台路由配置
 app.use('/admin/articles', adminAuth, adminArticlesRouter);
