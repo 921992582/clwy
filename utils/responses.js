@@ -12,7 +12,8 @@ function success(res, message, data = {}, code = 200) {
   res.status(code).json({
     status: true,
     message,
-    data
+    data,
+    code
   });
 }
 
@@ -48,7 +49,8 @@ function failure(res, error) {
   res.status(statusCode).json({
     status: false,
     message: `请求失败: ${error.name}`,
-    errors: Array.isArray(errors) ? errors : [errors]
+    errors: Array.isArray(errors) ? errors : [errors],
+    code: statusCode
   });
 }
 
