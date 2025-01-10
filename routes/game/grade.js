@@ -125,7 +125,7 @@ router.get('/', async function (req, res) {
     }));
 
 
-    success(res, '查询章节列表成功。', {
+    success(res, '查询成功。', {
       data: formattedRankList || [],
       pagination: {
         total: count,
