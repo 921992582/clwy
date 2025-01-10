@@ -43,5 +43,5 @@ module.exports = {
   config,
   client,
   singleFileUpload,
-  multipleFilesUpload,
+  multipleFilesUpload
 }
