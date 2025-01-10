@@ -97,12 +97,12 @@ router.get('/', async function (req, res) {
       }
     })
     if (!IsExistGame) {
-      success(res, '游戏不存在', {}, 200)
+      success(res, '游戏不存在', [], 200)
       return
     }
 
 
-    const gameList = await GameGrade.findAll({
+    const {count, rows} = await GameGrade.findAndCountAll({
       where: {
         gameId: IsExistGame.id
       },
@@ -117,14 +117,22 @@ router.get('/', async function (req, res) {
       }]
     })
 
-    const formattedRankList = gameList.map(item => ({
+    const formattedRankList = rows.map(item => ({
       username: item.GameUser.name,
       game: item.Game.name,
       grade: item.grade,
       avatar: item.GameUser.avatar
     }));
-    success(res, '查询成功', formattedRankList)
 
+
+    success(res, '查询章节列表成功。', {
+      data: formattedRankList || [],
+      pagination: {
+        total: count,
+        currentPage,
+        pageSize,
+      }
+    });
 
   } catch
     (error) {
