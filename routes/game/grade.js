@@ -97,7 +97,7 @@ router.get('/', async function (req, res) {
       }
     })
     if (!IsExistGame) {
-      success(res, '游戏不存在', [], 200)
+      success(res, '游戏不存在', {data: []}, 200)
       return
     }
 

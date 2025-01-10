@@ -17,7 +17,7 @@ router.post('/aliyun', function (req, res) {
       if (error) {
         return failure(res, error);
       }
-
+      console.log(req.file, '<<><>')
       if (!req.file) {
         return failure(res, new BadRequest('请选择要上传的文件。'));
       }
