@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { Course, Category, Chapter, User } = require('../models');
-const { success, failure } = require('../utils/responses');
-const { NotFound } = require('http-errors');
+const {Course, Category, Chapter, User} = require('../models');
+const {success, failure} = require('../utils/responses');
+const {NotFound} = require('http-errors');
 
 /**
  * 查询章节详情
@@ -10,30 +10,13 @@ const { NotFound } = require('http-errors');
  */
 router.get('/:id', async function (req, res) {
   try {
-    const { id } = req.params;
-    // const condition = {
-    //   attributes: { exclude: ['CourseId'] },
-    //   include: [
-    //     {
-    //       model: Course,
-    //       as: 'course',
-    //       attributes: ['id', 'name'],
-    //       include: [
-    //         {
-    //           model: User,
-    //           as: 'user',
-    //           attributes: ['id', 'username', 'nickname', 'avatar', 'company'],
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // };
+    const {id} = req.params;
 
     const chapter = await Chapter.findByPk(id, {
-      attributes: { exclude: ['CourseId'] }
+      attributes: {exclude: ['CourseId']}
     });
     if (!chapter) {
-      throw new NotFound(`ID: ${ id }的章节未找到。`)
+      throw new NotFound(`ID: ${id}的章节未找到。`)
     }
 
     // 查询章节关联的课程
@@ -41,22 +24,25 @@ router.get('/:id', async function (req, res) {
       attributes: ['id', 'name', 'userId'],
     });
 
-    // 查询课程关联的用户
-    const user = await course.getUser({
-      attributes: ['id', 'username', 'nickname', 'avatar', 'company'],
-    });
+    const [user, chapters] = await Promise.all([
+      // 查询课程关联的用户
+      course.getUser({
+        attributes: ['id', 'username', 'nickname', 'avatar', 'company'],
+      }),
+      // 同属一个课程的所有章节
+      Chapter.findAll({
+        attributes: {exclude: ['CourseId', 'content']},
+        where: {courseId: chapter.courseId},
+        order: [['rank', 'ASC'], ['id', 'DESC']]
+      })
+    ]);
 
-    // 同属一个课程的所有章节
-    const chapters = await Chapter.findAll({
-      attributes: { exclude: ['CourseId', 'content'] },
-      where: { courseId: chapter.courseId },
-      order: [['rank', 'ASC'], ['id', 'DESC']]
-    });
-
-    success(res, '查询章节成功。', { chapter, course, user, chapters });
+    success(res, '查询章节成功。', {chapter, course, user, chapters});
   } catch (error) {
     failure(res, error);
   }
 });
+
+
 
 module.exports = router;

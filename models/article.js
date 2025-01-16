@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
+
   Article.init({
     title: {
       type: DataTypes.STRING,
@@ -29,8 +30,13 @@ module.exports = (sequelize, DataTypes) => {
         len: {
           args: [2, 45],
           msg: '标题长度需要在2 ~ 45个字符之间。'
-        }
+        },
+
       }
+    },
+
+    deletedAt: {
+      type: DataTypes.DATE
     },
     content: DataTypes.TEXT,
     createdAt: {
@@ -47,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
+    paranoid: true,
     modelName: 'Article',
   });
   return Article;
