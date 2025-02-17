@@ -1,4 +1,4 @@
-const { createClient } = require('redis');
+const {createClient} = require('redis');
 
 // 创建全局的 Redis 客户端实例
 let client;
@@ -52,4 +52,24 @@ const delKey = async (key) => {
   await client.del(key);
 };
 
-module.exports = { redisClient, setKey, getKey, delKey };
+/**
+ * 获取匹配模式的所有键名
+ * @param pattern
+ * @returns {Promise<*>}
+ */
+const getKeysByPattern = async (pattern) => {
+  if (!client) await redisClient();
+  return await client.keys(pattern);
+}
+
+/**
+ * 清空所有缓存数据
+ * @returns {Promise<void>}
+ */
+const flushAll = async () => {
+  if (!client) await redisClient();
+  await client.flushAll();
+}
+
+module.exports = {redisClient, setKey, getKey, delKey, getKeysByPattern, flushAll};
+

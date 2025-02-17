@@ -31,6 +31,7 @@ const adminChaptersRouter = require('./routes/admin/chapters');
 const adminChartsRouter = require('./routes/admin/charts');
 const adminAttachmentsRouter = require('./routes/admin/attachments');
 const adminAuthRouter = require('./routes/admin/auth');
+const adminSettingRouter = require('./routes/admin/settings');
 
 // 游戏路由
 const Game = require('./routes/game/grade');
@@ -71,5 +72,7 @@ app.use('/admin/chapters', adminAuth, adminChaptersRouter);
 app.use('/admin/charts', adminAuth, adminChartsRouter);
 app.use('/admin/attachments', adminAuth, adminAttachmentsRouter);
 app.use('/admin/auth', adminAuthRouter);
+app.use('/admin/setting', adminSettingRouter);
+
 
 module.exports = app;

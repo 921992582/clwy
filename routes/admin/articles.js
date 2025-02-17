@@ -5,6 +5,8 @@ const {Op} = require('sequelize');
 const {NotFound} = require('http-errors');
 const {success, failure} = require('../../utils/responses');
 
+
+const {getKeysByPattern, delKey} = require('../../utils/redis');
 /**
  * 查询文章列表
  * GET /admin/articles
@@ -15,6 +17,7 @@ router.get('/', async function (req, res) {
     const currentPage = Math.abs(Number(query.currentPage)) || 1;
     const pageSize = Math.abs(Number(query.pageSize)) || 10;
     const offset = (currentPage - 1) * pageSize;
+
 
     const condition = {
       where: {},
@@ -74,6 +77,8 @@ router.post('/', async function (req, res) {
     const body = filterBody(req);
 
     const article = await Article.create(body);
+    await clearCache();
+
     success(res, '创建文章成功。', {article}, 201);
   } catch (error) {
     failure(res, error);
@@ -91,6 +96,7 @@ router.put('/:id', async function (req, res) {
     const body = filterBody(req);
 
     await article.update(body);
+    await clearCache(article.id);
     success(res, '更新文章成功。', {article});
   } catch (error) {
     failure(res, error);
@@ -109,6 +115,7 @@ router.post('/delete', async function (req, res) {
     console.log('时这儿吗', id)
 
     await Article.destroy({where: {id: id}});
+    await clearCache(id);
 
     success(res, '已删除到回收站。');
   } catch (error) {
@@ -158,6 +165,8 @@ router.post('/restore', async function (req, res) {
     const {id} = req.body;
 
     await Article.restore({where: {id: id}});
+    await clearCache(id);
+
     success(res, '已恢复成功。')
   } catch (error) {
     failure(res, error);
@@ -176,5 +185,27 @@ function filterBody(req) {
     content: req.body.content,
   };
 }
+
+
+/**
+ * 清除缓存
+ * @param id
+ * @returns {Promise<void>}
+ */
+async function clearCache(id = null) {
+  // 清除所有文章列表缓存
+  let keys = await getKeysByPattern('articles:*');
+  if (keys.length !== 0) {
+    await delKey(keys);
+  }
+
+  // 如果传递了id，则通过id清除文章详情缓存
+  if (id) {
+    // 如果是数组，则遍历
+    const keys = Array.isArray(id) ? id.map(item => `article:${item}`) : `article:${id}`;
+    await delKey(keys);
+  }
+}
+
 
 module.exports = router;

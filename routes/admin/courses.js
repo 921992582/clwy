@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { Course, Category, User, Chapter } = require('../../models');
-const { Op } = require('sequelize');
-const { NotFound, Conflict } = require('http-errors');
-const { success, failure } = require('../../utils/responses');
-
+const {Course, Category, User, Chapter} = require('../../models');
+const {Op} = require('sequelize');
+const {NotFound, Conflict} = require('http-errors');
+const {success, failure} = require('../../utils/responses');
+const {getKeysByPattern, delKey} = require('../../utils/redis');
 /**
  * 查询课程列表
  * GET /admin/courses
@@ -34,7 +34,7 @@ router.get('/', async function (req, res) {
 
     if (query.name) {
       condition.where.name = {
-        [Op.like]: `%${ query.name }%`
+        [Op.like]: `%${query.name}%`
       };
     }
 
@@ -46,7 +46,7 @@ router.get('/', async function (req, res) {
       condition.where.introductory = query.introductory === 'true';
     }
 
-    const { count, rows } = await Course.findAndCountAll(condition);
+    const {count, rows} = await Course.findAndCountAll(condition);
     success(res, '查询课程列表成功。', {
       courses: rows,
       pagination: {
@@ -67,7 +67,7 @@ router.get('/', async function (req, res) {
 router.get('/:id', async function (req, res) {
   try {
     const course = await getCourse(req);
-    success(res, '查询课程成功。', { course });
+    success(res, '查询课程成功。', {course});
   } catch (error) {
     failure(res, error);
   }
@@ -84,7 +84,8 @@ router.post('/', async function (req, res) {
     body.userId = req.user.id;
 
     const course = await Course.create(body);
-    success(res, '创建课程成功。', { course }, 201);
+    await clearCache();
+    success(res, '创建课程成功。', {course}, 201);
   } catch (error) {
     failure(res, error);
   }
@@ -100,7 +101,8 @@ router.put('/:id', async function (req, res) {
     const body = filterBody(req);
 
     await course.update(body);
-    success(res, '更新课程成功。', { course });
+    await clearCache(course);
+    success(res, '更新课程成功。', {course});
   } catch (error) {
     failure(res, error);
   }
@@ -114,12 +116,13 @@ router.delete('/:id', async function (req, res) {
   try {
     const course = await getCourse(req);
 
-    const count = await Chapter.count({ where: { courseId: req.params.id } });
+    const count = await Chapter.count({where: {courseId: req.params.id}});
     if (count > 0) {
       throw new Conflict('当前课程有章节，无法删除。');
     }
 
     await course.destroy();
+    await clearCache(course);
     success(res, '删除课程成功。');
   } catch (error) {
     failure(res, error);
@@ -132,7 +135,7 @@ router.delete('/:id', async function (req, res) {
  */
 function getCondition() {
   return {
-    attributes: { exclude: ['CategoryId', 'UserId'] },
+    attributes: {exclude: ['CategoryId', 'UserId']},
     include: [
       {
         model: Category,
@@ -152,12 +155,12 @@ function getCondition() {
  * 公共方法：查询当前课程
  */
 async function getCourse(req) {
-  const { id } = req.params;
+  const {id} = req.params;
   const condition = getCondition();
 
   const course = await Course.findByPk(id, condition);
   if (!course) {
-    throw new NotFound(`ID: ${ id }的课程未找到。`)
+    throw new NotFound(`ID: ${id}的课程未找到。`)
   }
 
   return course;
@@ -177,6 +180,17 @@ function filterBody(req) {
     introductory: req.body.introductory,
     content: req.body.content
   };
+}
+
+async function clearCache(course = null) {
+  let keys = await getKeysByPattern('courses:*');
+  if (keys.length !== 0) {
+    await delKey(keys);
+  }
+
+  if (course) {
+    await delKey(`course:${course.id}`);
+  }
 }
 
 module.exports = router;

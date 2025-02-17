@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../../models');
-const { Op } = require('sequelize');
-const { NotFound } = require('http-errors');
-const { success, failure } = require('../../utils/responses');
-
+const {User} = require('../../models');
+const {Op} = require('sequelize');
+const {NotFound} = require('http-errors');
+const {success, failure} = require('../../utils/responses');
+const {delKey} = require('../../utils/redis');
 /**
  * 查询用户列表
  * GET /admin/users
@@ -33,7 +33,7 @@ router.get('/', async function (req, res) {
 
     if (query.nickname) {
       condition.where.nickname = {
-        [Op.like]: `%${ query.nickname }%`
+        [Op.like]: `%${query.nickname}%`
       };
     }
 
@@ -41,7 +41,7 @@ router.get('/', async function (req, res) {
       condition.where.role = query.role;
     }
 
-    const { count, rows } = await User.findAndCountAll(condition);
+    const {count, rows} = await User.findAndCountAll(condition);
     success(res, '查询用户列表成功。', {
       users: rows,
       pagination: {
@@ -62,7 +62,7 @@ router.get('/', async function (req, res) {
 router.get('/me', async function (req, res) {
   try {
     const user = req.user;
-    success(res, '查询当前用户信息成功。', { user });
+    success(res, '查询当前用户信息成功。', {user});
   } catch (error) {
     failure(res, error);
   }
@@ -75,7 +75,7 @@ router.get('/me', async function (req, res) {
 router.get('/:id', async function (req, res) {
   try {
     const user = await getUser(req);
-    success(res, '查询用户成功。', { user });
+    success(res, '查询用户成功。', {user});
   } catch (error) {
     failure(res, error);
   }
@@ -90,7 +90,7 @@ router.post('/', async function (req, res) {
     const body = filterBody(req);
 
     const user = await User.create(body);
-    success(res, '创建用户成功。', { user }, 201);
+    success(res, '创建用户成功。', {user}, 201);
   } catch (error) {
     failure(res, error);
   }
@@ -106,7 +106,8 @@ router.put('/:id', async function (req, res) {
     const body = filterBody(req);
 
     await user.update(body);
-    success(res, '更新用户成功。', { user });
+    await clearCache(user);
+    success(res, '更新用户成功。', {user});
   } catch (error) {
     failure(res, error);
   }
@@ -116,11 +117,11 @@ router.put('/:id', async function (req, res) {
  * 公共方法：查询当前用户
  */
 async function getUser(req) {
-  const { id } = req.params;
+  const {id} = req.params;
 
   const user = await User.findByPk(id);
   if (!user) {
-    throw new NotFound(`ID: ${ id }的用户未找到。`)
+    throw new NotFound(`ID: ${id}的用户未找到。`)
   }
 
   return user;
@@ -143,6 +144,16 @@ function filterBody(req) {
     role: req.body.role,
     avatar: req.body.avatar
   };
+}
+
+
+/**
+ * 清除缓存
+ * @param user
+ * @returns {Promise<void>}
+ */
+async function clearCache(user) {
+  await delKey(`user:${user.id}`);
 }
 
 module.exports = router;
