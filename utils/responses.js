@@ -1,5 +1,16 @@
 const createError = require('http-errors');
 const multer = require('multer');
+const winston = require('winston');
+
+// 配置 winston 日志记录器
+const logger = winston.createLogger({
+  level: 'error',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'error.log' })
+  ]
+});
 
 /**
  * 请求成功
@@ -26,6 +37,13 @@ function failure(res, error) {
   // 默认响应为 500，服务器错误
   let statusCode = 500;
   let errors = '服务器错误';
+
+  // 记录详细的错误信息到日志文件
+  logger.error({
+    message: '请求失败',
+    error: error.stack || error.message,
+    name: error.name
+  });
 
   if (error.name === 'SequelizeValidationError') {  // Sequelize 验证错误
     statusCode = 400;

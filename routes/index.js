@@ -9,7 +9,6 @@ const {setKey, getKey} = require('../utils/redis');
  */
 router.get('/', async function (req, res, next) {
   try {
-
     // 如果有缓存，直接返回缓存数据
     let data = await getKey('index');
     if (data) {
@@ -62,7 +61,7 @@ router.get('/', async function (req, res, next) {
     }
 
     // 设置缓存过期时间，为10秒钟
-    await setKey('index', data,  30 * 60);
+    await setKey('index', data, 30 * 60);
 
     return success(res, '查询首页数据成功。', data);
   } catch (error) {
