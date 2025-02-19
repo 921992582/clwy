@@ -8,6 +8,8 @@ const jwt = require('jsonwebtoken');
 const {Op} = require('sequelize');
 const validateCaptcha = require('../middlewares/validate-captcha');
 const {delKey} = require('../utils/redis');
+const sendMail = require('../utils/mail');
+
 /**
  * 用户注册
  * POST /auth/sign_up
@@ -27,6 +29,13 @@ router.post('/sign_up', validateCaptcha, async function (req, res) {
     delete user.dataValues.password;         // 删除密码
     // 请求成功，删除验证码，防止重复使用
     await delKey(req.body.captchaKey);
+
+    const html = `
+  您好，<span style="color: red">${user.nickname}。</span><br><br>
+  恭喜，您已成功注册会员！<br><br>
+  xw`
+    await sendMail(user.email, '「xw」的注册成功通知', html);
+
     success(res, '创建用户成功。', {user}, 201);
   } catch (error) {
     failure(res, error);
