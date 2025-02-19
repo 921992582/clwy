@@ -9,7 +9,10 @@ let client;
 const redisClient = async () => {
   if (client) return; // 如果客户端已经初始化，则不再重复初始化
 
-  client = await createClient()
+  client = await createClient({
+    url: 'redis://47.108.67.229:6379',
+    password:'xiewei5036921',
+  })
     .on('error', err => console.log('Redis 连接失败', err))
     .connect();
 };
@@ -22,7 +25,7 @@ const redisClient = async () => {
  */
 const setKey = async (key, value, ttl = null) => {
   if (!client) await redisClient(); // 确保客户端已初始化
-  value = JSON.stringify(value); // 将对象转换为JSON字符串d
+  value = JSON.stringify(value); // 将对象转换为JSON字符串
   await client.set(key, value);
 
   // 如果提供了ttl，则设置过期时间
