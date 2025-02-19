@@ -20,6 +20,8 @@ const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const likesRouter = require('./routes/likes');
 const uploadsRouter = require('./routes/uploads');
+const captchaRouter = require('./routes/captcha');
+
 
 // 后台路由文件
 const adminArticlesRouter = require('./routes/admin/articles');
@@ -32,7 +34,6 @@ const adminChartsRouter = require('./routes/admin/charts');
 const adminAttachmentsRouter = require('./routes/admin/attachments');
 const adminAuthRouter = require('./routes/admin/auth');
 const adminSettingRouter = require('./routes/admin/settings');
-
 // 游戏路由
 const Game = require('./routes/game/grade');
 
@@ -61,6 +62,8 @@ app.use('/likes', userAuth, likesRouter);
 app.use('/uploads', userAuth, uploadsRouter);
 
 app.use('/game', Game);
+
+app.use('/captcha', captchaRouter);
 
 // 后台路由配置
 app.use('/admin/articles', adminAuth, adminArticlesRouter);

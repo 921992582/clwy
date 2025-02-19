@@ -22,7 +22,7 @@ const redisClient = async () => {
  */
 const setKey = async (key, value, ttl = null) => {
   if (!client) await redisClient(); // 确保客户端已初始化
-  value = JSON.stringify(value); // 将对象转换为JSON字符串
+  value = JSON.stringify(value); // 将对象转换为JSON字符串d
   await client.set(key, value);
 
   // 如果提供了ttl，则设置过期时间
