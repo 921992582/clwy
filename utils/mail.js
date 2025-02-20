@@ -14,9 +14,9 @@ const transporter = nodemailer.createTransport({
 });
 /**
  * 发送邮件
- * @param email
- * @param subject
- * @param html
+ * @param email //  需要发送的邮箱
+ * @param subject // 主题
+ * @param html // 内容
  * @returns {Promise<void>}
  */
 const sendMail = async (email, subject, html) => {

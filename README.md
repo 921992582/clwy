@@ -34,7 +34,12 @@ MAILER_SECURE=465端口填写：true，否则填写：false
 MAILER_USER=你的邮箱地址
 MAILER_PASS=你的邮箱授权码或密码
 ```
+
 - `MAILER`开头的配置，为邮件服务器的配置。
+  RABBITMQ_URL=
+
+- `RABBITMQ_URL`配置为消息队列服务器地址。
+
 
 ## 生成秘钥
 
