@@ -1,4 +1,5 @@
 const {createClient} = require('redis');
+const logger = require('./logger');
 
 // 创建全局的 Redis 客户端实例
 let client;
@@ -11,9 +12,9 @@ const redisClient = async () => {
 
   client = await createClient({
     url: 'redis://47.108.67.229:6379',
-    password:'xiewei5036921',
+    password: 'xiewei5036921',
   })
-    .on('error', err => console.log('Redis 连接失败', err))
+    .on('error', err => logger.error('Redis 连接失败', err))
     .connect();
 };
 

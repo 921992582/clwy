@@ -1,6 +1,7 @@
 we# Ignore Node.js files.
 /node_modules
-
+/error.log
+/combined.log
 # Ignore environment files.
 /.env
 

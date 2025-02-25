@@ -1,5 +1,6 @@
 const amqp = require('amqplib');
 const sendMail = require('./mail');
+const logger = require('./logger');
 
 // 创建全局的 RabbitMQ 连接和通道
 let connection;
@@ -13,7 +14,7 @@ const connectWithRetry = async (url, retries = 5, delay = 5000) => {
       return await amqp.connect(url);
     } catch (error) {
       attempt++;
-      console.error(`RabbitMQ 连接尝试 ${attempt} 失败:`, error);
+      logger.error(`RabbitMQ 连接尝试 ${attempt} 失败:`, error);
       if (attempt < retries) {
         await new Promise(resolve => setTimeout(resolve, delay));
       }
@@ -35,19 +36,19 @@ const connectToRabbitMQ = async () => {
 
     // 监听连接关闭事件，方便处理异常
     connection.on('close', () => {
-      console.warn('RabbitMQ 连接已关闭，尝试重新连接...');
+      logger.warn('RabbitMQ 连接已关闭，尝试重新连接...');
       connection = null;
       channel = null;
     });
 
     // 监听连接错误事件，增强错误处理能力
     connection.on('error', (err) => {
-      console.error('RabbitMQ 连接发生错误:', err);
+      logger.error('RabbitMQ 连接发生错误:', err);
     });
 
-    await channel.assertQueue('mail_queue', { durable: true });
+    await channel.assertQueue('mail_queue', {durable: true});
   } catch (error) {
-    console.error('RabbitMQ 连接失败：', error);
+    logger.error('RabbitMQ 连接失败：', error);
     throw error;
   }
 };
@@ -60,13 +61,13 @@ const mailProducer = async (msg) => {
     await connectToRabbitMQ(); // 确保已连接
 
     // 消息持久化设置，提高消息可靠性
-    const options = { persistent: true };
+    const options = {persistent: true};
     const sent = channel.sendToQueue('mail_queue', Buffer.from(JSON.stringify(msg)), options);
     if (!sent) {
-      console.warn('消息未能立即入队，等待下次机会');
+      logger.warn('消息未能立即入队，等待下次机会');
     }
   } catch (error) {
-    console.error('邮件队列生产者错误：', error);
+    logger.error('邮件队列生产者错误：', error);
     throw error;
   }
 };
@@ -86,15 +87,15 @@ const mailConsumer = async () => {
           await sendMail(message.to, message.subject, message.html);
           channel.ack(msg); // 手动确认消息
         } catch (error) {
-          console.error('处理邮件消息时出错:', error);
+          logger.error('处理邮件消息时出错:', error);
           channel.nack(msg, false, true); // 消息处理失败，重新入队
         }
       }
-    }, { noAck: false }); // 关闭自动确认
+    }, {noAck: false}); // 关闭自动确认
 
-    console.log('邮件队列消费者已开始监听');
+    logger.info('邮件队列消费者已开始监听');
   } catch (error) {
-    console.error('邮件队列消费者错误：', error);
+    logger.error('邮件队列消费者错误：', error);
     throw error;
   }
 };

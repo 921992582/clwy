@@ -1,16 +1,7 @@
 const createError = require('http-errors');
 const multer = require('multer');
-const winston = require('winston');
+const logger = require("./logger");
 
-// 配置 winston 日志记录器
-const logger = winston.createLogger({
-  level: 'error',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log' })
-  ]
-});
 
 /**
  * 请求成功
@@ -28,24 +19,18 @@ function success(res, message, data = {}, code = 200) {
   });
 }
 
+
 /**
  * 请求失败
  * @param res
  * @param error
  */
 function failure(res, error) {
-  // 默认响应为 500，服务器错误
-  let statusCode = 500;
-  let errors = '服务器错误';
+  // 初始化状态码和错误信息
+  let statusCode;
+  let errors;
 
-  // 记录详细的错误信息到日志文件
-  logger.error({
-    message: '请求失败',
-    error: error.stack || error.message,
-    name: error.name
-  });
-
-  if (error.name === 'SequelizeValidationError') {  // Sequelize 验证错误
+  if (error.name === 'SequelizeValidationError') {      // Sequelize 验证错误
     statusCode = 400;
     errors = error.errors.map(e => e.message);
   } else if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {  // Token 验证错误
@@ -54,7 +39,7 @@ function failure(res, error) {
   } else if (error instanceof createError.HttpError) {  // http-errors 库创建的错误
     statusCode = error.status;
     errors = error.message;
-  } else if (error instanceof multer.MulterError) {
+  } else if (error instanceof multer.MulterError) {     // multer 上传错误
     if (error.code === 'LIMIT_FILE_SIZE') {
       statusCode = 413;
       errors = '文件大小超出限制。';
@@ -62,13 +47,16 @@ function failure(res, error) {
       statusCode = 400;
       errors = error.message;
     }
+  } else {                                              // 其他未知错误
+    statusCode = 500;
+    errors = '服务器错误。';
+    logger.error('服务器错误：', error);
   }
 
   res.status(statusCode).json({
     status: false,
     message: `请求失败: ${error.name}`,
-    errors: Array.isArray(errors) ? errors : [errors],
-    code: statusCode
+    errors: Array.isArray(errors) ? errors : [errors]
   });
 }
 
