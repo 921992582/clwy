@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {Course, Category, Chapter, User} = require('../models');
 const {success, failure} = require('../utils/responses');
-const {NotFound} = require('http-errors');
+const {NotFound, Forbidden} = require('http-errors');
 const {setKey, getKey} = require('../utils/redis');
 
 /**
@@ -24,6 +24,8 @@ router.get('/:id', async function (req, res) {
       }
       await setKey(`chapter:${id}`, chapter);
     }
+    // 检查用户是否能浏览当前章节
+    await checkUserRole(req, chapter);
 
     // 查询章节关联的课程
     let course = await getKey(`course:${chapter.courseId}`);
@@ -59,6 +61,29 @@ router.get('/:id', async function (req, res) {
     failure(res, error);
   }
 });
+
+
+/**
+ * 检查用户是否能浏览当前章节
+ * @param req
+ * @param chapter
+ * @returns {Promise<void>}
+ */
+async function checkUserRole(req, chapter) {
+  // 如果章节是免费的
+
+  console.log(chapter.free, 'sajfksjdflk')
+  if (chapter.free) {
+    return;
+  }
+
+  // 检查用户是否有权限访收费章节
+  const allowedRoles = [1, 100]; // 大会员和管理员的角色ID
+  const user = await User.findByPk(req.userId);
+  if (!allowedRoles.includes(user.role)) {
+    throw new Forbidden('您没有权限浏览，请先购买大会员后再访问。');
+  }
+}
 
 
 module.exports = router;
