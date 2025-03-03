@@ -7,7 +7,7 @@ const moment = require('moment');
 module.exports = (sequelize, DataTypes) => {
   class Order extends Model {
     static associate(models) {
-      models.Order.belongsTo(models.User, { as: 'user' });
+      models.Order.belongsTo(models.User, {as: 'user'});
     }
   }
 
@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     totalAmount: DataTypes.DECIMAL,
     paymentMethod: DataTypes.TINYINT,
     status: DataTypes.TINYINT,
+    membershipMonths: DataTypes.INTEGER,
     paidAt: {
       type: DataTypes.DATE,
       get() {

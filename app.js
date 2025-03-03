@@ -23,6 +23,7 @@ const uploadsRouter = require('./routes/uploads');
 const captchaRouter = require('./routes/captcha');
 const membershipsRouter = require('./routes/memberships');
 const ordersRouter = require('./routes/orders');
+const alipayRouter = require('./routes/alipay');
 // 后台路由文件
 const adminArticlesRouter = require('./routes/admin/articles');
 const adminCategoriesRouter = require('./routes/admin/categories');
@@ -65,7 +66,7 @@ app.use('/likes', userAuth, likesRouter);
 app.use('/uploads', userAuth, uploadsRouter);
 app.use('/orders', userAuth, ordersRouter);
 app.use('/memberships', membershipsRouter);
-
+app.use('/alipay', alipayRouter);
 
 app.use('/game', Game);
 

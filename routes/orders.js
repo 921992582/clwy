@@ -115,6 +115,7 @@ router.post('/', async function (req, res, next) {
       outTradeNo: outTradeNo,
       userId: req.userId,
       subject: membership.name,
+      membershipMonths: membership.durationMonths,
       totalAmount: membership.price,
       status: 0,
     });
