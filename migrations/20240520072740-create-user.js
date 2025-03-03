@@ -53,7 +53,7 @@ module.exports = {
     await queryInterface.addIndex(
       'Users', {
         fields: ['email'],  // 要索引的字段
-        unique: true        // 唯一索引
+        unique: true        // 唯一索引q
       });
     await queryInterface.addIndex(
       'Users', {
