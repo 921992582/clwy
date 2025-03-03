@@ -1,10 +1,12 @@
 'use strict';
 const bcrypt = require('bcryptjs');
 const moment = require('moment/moment');
+const { Op } = require('sequelize');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('Users', [
+    const users = [
       {
         email: 'admin@clwy.cn',
         username: 'admin',
@@ -38,7 +40,6 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       },
-
       {
         email: 'user3@clwy.cn',
         username: 'user3',
@@ -50,7 +51,19 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date()
       }
-    ], {});
+    ];
+
+    for (const user of users) {
+      const existingUser = await queryInterface.rawSelect('Users', {
+        where: {
+          email: user.email
+        }
+      }, ['id']);
+
+      if (!existingUser) {
+        await queryInterface.insert('Users', user);
+      }
+    }
   },
 
   async down(queryInterface, Sequelize) {
