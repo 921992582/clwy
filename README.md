@@ -26,7 +26,6 @@ ALIYUN_REGION=阿里云 OSS Bucket 所在地域名称
 - `SECRET`配置为秘钥。
 - `ALIYUN`开头的配置，均为阿里云的配置。请注册阿里云云账号，创建存储空间，并创建`Access Key`。
 
-
 ```txt
 MAILER_HOST=邮件服务器地址
 MAILER_PORT=邮件服务器端口
@@ -39,7 +38,6 @@ MAILER_PASS=你的邮箱授权码或密码
   RABBITMQ_URL=
 
 - `RABBITMQ_URL`配置为消息队列服务器地址。
-
 
 ## 生成秘钥
 

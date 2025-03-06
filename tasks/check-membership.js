@@ -18,27 +18,27 @@ function scheduleMembershipCheck() {
         where: {
           role: 1,
           membershipExpiredAt: {
-            [Op.lt]: new Date()  // 小于当前时间
-          }
+            [Op.lt]: new Date(), // 小于当前时间
+          },
         },
         transaction: t,
-        lock: true
+        lock: true,
       });
 
       // 已过期的用户 ID 列表
-      const userIds = expiredUsers.map(user => user.id);
+      const userIds = expiredUsers.map((user) => user.id);
 
       // 批量更新过期用户的角色
       await User.update(
         {
-          role: 0,  // 将用户组改为普通用户
-          membershipExpiredAt: null
+          role: 0, // 将用户组改为普通用户
+          membershipExpiredAt: null,
         },
         {
           where: {
-            id: userIds
+            id: userIds,
           },
-          transaction: t
+          transaction: t,
         }
       );
 

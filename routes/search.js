@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Course } = require('../models');
 const { success, failure } = require('../utils/responses');
-const { Op } = require("sequelize");
+const { Op } = require('sequelize');
 
 /**
  * 搜索课程
@@ -20,12 +20,12 @@ router.get('/', async function (req, res) {
       attributes: { exclude: ['CategoryId', 'UserId', 'content'] },
       order: [['id', 'DESC']],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     };
 
     if (query.name) {
       condition.where.name = {
-        [Op.like]: `%${query.name}%`
+        [Op.like]: `%${query.name}%`,
       };
     }
 
@@ -36,7 +36,7 @@ router.get('/', async function (req, res) {
         total: count,
         currentPage,
         pageSize,
-      }
+      },
     });
   } catch (error) {
     failure(res, error);

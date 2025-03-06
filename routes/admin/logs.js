@@ -71,7 +71,7 @@ async function getLog(req) {
 
   const log = await Log.findByPk(id);
   if (!log) {
-    throw new NotFound(`ID: ${id}的日志未找到。`)
+    throw new NotFound(`ID: ${id}的日志未找到。`);
   }
 
   return log;

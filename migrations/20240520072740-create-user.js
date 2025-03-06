@@ -7,65 +7,62 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       email: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       username: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       password: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       nickname: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       sex: {
         allowNull: false,
         defaultValue: 9,
-        type: Sequelize.TINYINT.UNSIGNED
+        type: Sequelize.TINYINT.UNSIGNED,
       },
       company: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       introduce: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       role: {
         allowNull: false,
         defaultValue: 0,
-        type: Sequelize.TINYINT.UNSIGNED
+        type: Sequelize.TINYINT.UNSIGNED,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
-    await queryInterface.addIndex(
-      'Users', {
-        fields: ['email'],  // 要索引的字段
-        unique: true        // 唯一索引q
-      });
-    await queryInterface.addIndex(
-      'Users', {
-        fields: ['username'],
-        unique: true
-      });
-    await queryInterface.addIndex(
-      'Users', {
-        fields: ['role']
-      });
+    await queryInterface.addIndex('Users', {
+      fields: ['email'], // 要索引的字段
+      unique: true, // 唯一索引q
+    });
+    await queryInterface.addIndex('Users', {
+      fields: ['username'],
+      unique: true,
+    });
+    await queryInterface.addIndex('Users', {
+      fields: ['role'],
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Users');
-  }
+  },
 };

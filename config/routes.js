@@ -4,7 +4,6 @@ const router = express.Router();
 const adminAuth = require('../middlewares/admin-auth');
 const userAuth = require('../middlewares/user-auth');
 
-
 // 前台路由文件
 const indexRouter = require('../routes/index');
 const categoriesRouter = require('../routes/categories');
@@ -37,11 +36,6 @@ const adminMembershipsRouter = require('../routes/admin/memberships');
 const adminOrdersRouter = require('../routes/admin/orders');
 // 游戏路由
 const Game = require('../routes/game/grade');
-
-
-
-
-
 
 // 前台路由配置
 router.use('/', indexRouter);
@@ -77,6 +71,5 @@ router.use('/admin/memberships', adminAuth, adminMembershipsRouter);
 router.use('/admin/orders', adminAuth, adminOrdersRouter);
 router.use('/admin/auth', adminAuthRouter);
 router.use('/admin/setting', adminSettingRouter);
-
 
 module.exports = router;

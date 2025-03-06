@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {Chapter, Course} = require('../../models');
-const {Op} = require('sequelize');
-const {NotFound, BadRequest} = require('http-errors');
-const {success, failure} = require('../../utils/responses');
-const {delKey} = require('../../utils/redis');
+const { Chapter, Course } = require('../../models');
+const { Op } = require('sequelize');
+const { NotFound, BadRequest } = require('http-errors');
+const { success, failure } = require('../../utils/responses');
+const { delKey } = require('../../utils/redis');
 /**
  * 查询章节列表
  * GET /admin/chapters
@@ -23,27 +23,30 @@ router.get('/', async function (req, res) {
     const condition = {
       ...getCondition(),
       where: {},
-      order: [['rank', 'ASC'], ['id', 'ASC']],
+      order: [
+        ['rank', 'ASC'],
+        ['id', 'ASC'],
+      ],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     };
 
     condition.where.courseId = query.courseId;
 
     if (query.title) {
       condition.where.title = {
-        [Op.like]: `%${query.title}%`
+        [Op.like]: `%${query.title}%`,
       };
     }
 
-    const {count, rows} = await Chapter.findAndCountAll(condition);
+    const { count, rows } = await Chapter.findAndCountAll(condition);
     success(res, '查询章节列表成功。', {
       chapters: rows,
       pagination: {
         total: count,
         currentPage,
         pageSize,
-      }
+      },
     });
   } catch (error) {
     failure(res, error);
@@ -57,7 +60,7 @@ router.get('/', async function (req, res) {
 router.get('/:id', async function (req, res) {
   try {
     const chapter = await getChapter(req);
-    success(res, '查询章节成功。', {chapter});
+    success(res, '查询章节成功。', { chapter });
   } catch (error) {
     failure(res, error);
   }
@@ -73,9 +76,9 @@ router.post('/', async function (req, res) {
 
     // 创建章节，并增加课程章节数
     const chapter = await Chapter.create(body);
-    await Course.increment('chaptersCount', {where: {id: chapter.courseId}});
+    await Course.increment('chaptersCount', { where: { id: chapter.courseId } });
     await clearCache(chapter);
-    success(res, '创建章节成功。', {chapter}, 201);
+    success(res, '创建章节成功。', { chapter }, 201);
   } catch (error) {
     failure(res, error);
   }
@@ -92,7 +95,7 @@ router.put('/:id', async function (req, res) {
 
     await chapter.update(body);
     await clearCache(chapter);
-    success(res, '更新章节成功。', {chapter});
+    success(res, '更新章节成功。', { chapter });
   } catch (error) {
     failure(res, error);
   }
@@ -108,7 +111,7 @@ router.delete('/:id', async function (req, res) {
 
     // 删除章节，并减少课程章节数
     await chapter.destroy();
-    await Course.decrement('chaptersCount', {where: {id: chapter.courseId}});
+    await Course.decrement('chaptersCount', { where: { id: chapter.courseId } });
     await clearCache(chapter);
     success(res, '删除章节成功。');
   } catch (error) {
@@ -122,27 +125,27 @@ router.delete('/:id', async function (req, res) {
  */
 function getCondition() {
   return {
-    attributes: {exclude: ['CourseId']},
+    attributes: { exclude: ['CourseId'] },
     include: [
       {
         model: Course,
         as: 'course',
-        attributes: ['id', 'name']
-      }
-    ]
-  }
+        attributes: ['id', 'name'],
+      },
+    ],
+  };
 }
 
 /**
  * 公共方法：查询当前章节
  */
 async function getChapter(req) {
-  const {id} = req.params;
+  const { id } = req.params;
   const condition = getCondition();
 
   const chapter = await Chapter.findByPk(id, condition);
   if (!chapter) {
-    throw new NotFound(`ID: ${id}的章节未找到。`)
+    throw new NotFound(`ID: ${id}的章节未找到。`);
   }
 
   return chapter;
@@ -160,7 +163,7 @@ function filterBody(req) {
     content: req.body.content,
     video: req.body.video,
     rank: req.body.rank,
-    free: req.body.free
+    free: req.body.free,
   };
 }
 

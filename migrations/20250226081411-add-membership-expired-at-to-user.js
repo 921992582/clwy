@@ -4,16 +4,15 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.addColumn('Users', 'membershipExpiredAt', {
-      type: Sequelize.DATE
+      type: Sequelize.DATE,
     });
 
-    await queryInterface.addIndex(
-      'Users', {
-        fields: ['membershipExpiredAt']
-      });
+    await queryInterface.addIndex('Users', {
+      fields: ['membershipExpiredAt'],
+    });
   },
 
   async down(queryInterface, Sequelize) {
     await queryInterface.removeColumn('Users', 'membershipExpiredAt');
-  }
+  },
 };

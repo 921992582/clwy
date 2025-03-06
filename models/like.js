@@ -1,8 +1,6 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-const moment = require("moment");
+const { Model } = require('sequelize');
+const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
   class Like extends Model {
@@ -15,24 +13,27 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Like.init({
-    courseId: DataTypes.INTEGER,
-    userId: DataTypes.INTEGER,
-    createdAt: {
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue("createdAt")).format("LL");
-      }
+  Like.init(
+    {
+      courseId: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
+      createdAt: {
+        type: DataTypes.DATE,
+        get() {
+          return moment(this.getDataValue('createdAt')).format('LL');
+        },
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        get() {
+          return moment(this.getDataValue('updatedAt')).format('LL');
+        },
+      },
     },
-    updatedAt: {
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue("updatedAt")).format("LL");
-      }
+    {
+      sequelize,
+      modelName: 'Like',
     }
-  }, {
-    sequelize,
-    modelName: 'Like',
-  });
+  );
   return Like;
 };

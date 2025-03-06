@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {Order, User, Membership} = require('../models');
-const {success, failure} = require('../utils/responses');
-const {BadRequest, NotFound} = require('http-errors');
-const {v4: uuidv4} = require('uuid');
-const {setKey, getKey} = require("../utils/redis");
+const { Order, User, Membership } = require('../models');
+const { success, failure } = require('../utils/responses');
+const { BadRequest, NotFound } = require('http-errors');
+const { v4: uuidv4 } = require('uuid');
+const { setKey, getKey } = require('../utils/redis');
 
 /**
  * 查询订单列表
@@ -19,10 +19,10 @@ router.get('/', async function (req, res) {
 
     const condition = {
       ...getCondition(),
-      where: {userId: req.userId},
+      where: { userId: req.userId },
       order: [['id', 'DESC']],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     };
 
     if (query.outTradeNo) {
@@ -37,14 +37,14 @@ router.get('/', async function (req, res) {
       condition.where.status = query.status;
     }
 
-    const {count, rows} = await Order.findAndCountAll(condition);
+    const { count, rows } = await Order.findAndCountAll(condition);
     success(res, '查询订单列表成功。', {
       orders: rows,
       pagination: {
         total: count,
         currentPage,
         pageSize,
-      }
+      },
     });
   } catch (error) {
     failure(res, error);
@@ -70,33 +70,33 @@ router.get('/:outTradeNo', async function (req, res) {
  */
 function getCondition() {
   return {
-    attributes: {exclude: ['id', 'UserId']},
+    attributes: { exclude: ['id', 'UserId'] },
     include: [
       {
         model: User,
         as: 'user',
-        attributes: ['id', 'username', 'avatar']
-      }
-    ]
-  }
+        attributes: ['id', 'username', 'avatar'],
+      },
+    ],
+  };
 }
 
 /**
  * 公共方法：查询当前订单
  */
 async function getOrder(req) {
-  const {outTradeNo} = req.params;
+  const { outTradeNo } = req.params;
 
   const order = await Order.findOne({
     ...getCondition(),
     where: {
       outTradeNo: outTradeNo,
-      userId: req.userId        // 用户只能查看自己的订单
+      userId: req.userId, // 用户只能查看自己的订单
     },
   });
 
   if (!order) {
-    throw new NotFound(`订单号: ${outTradeNo} 的订单未找到。`)
+    throw new NotFound(`订单号: ${outTradeNo} 的订单未找到。`);
   }
 
   return order;
@@ -120,12 +120,11 @@ router.post('/', async function (req, res, next) {
       status: 0,
     });
 
-    success(res, '订单创建成功。', {order});
+    success(res, '订单创建成功。', { order });
   } catch (error) {
     failure(res, error);
   }
 });
-
 
 /**
  * 查询大会员信息
@@ -133,7 +132,7 @@ router.post('/', async function (req, res, next) {
  * @returns {Promise<*>}
  */
 async function getMembership(req) {
-  const {membershipId} = req.body;
+  const { membershipId } = req.body;
   if (!membershipId) {
     throw new BadRequest('请选择要购买的大会员。');
   }
@@ -150,6 +149,5 @@ async function getMembership(req) {
 
   return membership;
 }
-
 
 module.exports = router;

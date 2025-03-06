@@ -7,28 +7,28 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       name: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       icp: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       copyright: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Settings');
-  }
+  },
 };

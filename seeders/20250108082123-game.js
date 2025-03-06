@@ -8,21 +8,25 @@ module.exports = {
       {
         name: '幻彩方格',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         name: '方体消除',
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ];
 
     for (const game of games) {
-      const existingGame = await queryInterface.rawSelect('Games', {
-        where: {
-          name: game.name
-        }
-      }, ['id']);
+      const existingGame = await queryInterface.rawSelect(
+        'Games',
+        {
+          where: {
+            name: game.name,
+          },
+        },
+        ['id']
+      );
 
       if (!existingGame) {
         await queryInterface.insert('Games', game);
@@ -32,5 +36,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Games', null, {});
-  }
+  },
 };

@@ -7,35 +7,33 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       courseId: {
         allowNull: false,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       userId: {
         allowNull: false,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
-    await queryInterface.addIndex(
-      'Likes', {
-        fields: ['courseId']
-      });
-    await queryInterface.addIndex(
-      'Likes', {
-        fields: ['userId']
-      });
+    await queryInterface.addIndex('Likes', {
+      fields: ['courseId'],
+    });
+    await queryInterface.addIndex('Likes', {
+      fields: ['userId'],
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Likes');
-  }
+  },
 };

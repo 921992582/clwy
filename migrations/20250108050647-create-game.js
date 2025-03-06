@@ -7,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       name: {
         allowNull: false,
@@ -15,20 +15,19 @@ module.exports = {
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
     await queryInterface.addIndex('Games', {
       fields: ['name'],
-      unique: true
-    })
-
+      unique: true,
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Games');
-  }
+  },
 };

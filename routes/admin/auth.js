@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {User} = require('../../models');
-const {Op} = require('sequelize');
-const {BadRequest, Unauthorized, NotFound} = require('http-errors');
-const {success, failure} = require('../../utils/responses');
+const { User } = require('../../models');
+const { Op } = require('sequelize');
+const { BadRequest, Unauthorized, NotFound } = require('http-errors');
+const { success, failure } = require('../../utils/responses');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken');
  */
 router.post('/sign_in', async (req, res) => {
   try {
-    const {login, password} = req.body;
+    const { login, password } = req.body;
 
     if (!login) {
       throw new BadRequest('邮箱/用户名必须填写。');
@@ -25,11 +25,8 @@ router.post('/sign_in', async (req, res) => {
 
     const condition = {
       where: {
-        [Op.or]: [
-          {email: login},
-          {username: login}
-        ]
-      }
+        [Op.or]: [{ email: login }, { username: login }],
+      },
     };
 
     // 通过email或username，查询用户是否存在
@@ -48,13 +45,16 @@ router.post('/sign_in', async (req, res) => {
     if (user.role !== 100) {
       throw new Unauthorized('您没有权限登录管理员后台。');
     }
-    console.log('process.env.example.SECRET', process.env)
+    console.log('process.env.example.SECRET', process.env);
     // 生成身份验证令牌
-    const token = jwt.sign({
-        userId: user.id
-      }, process.env.SECRET, {expiresIn: '30d'}
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      process.env.SECRET,
+      { expiresIn: '30d' }
     );
-    success(res, '登录成功。', {token});
+    success(res, '登录成功。', { token });
   } catch (error) {
     failure(res, error);
   }

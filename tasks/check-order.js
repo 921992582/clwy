@@ -1,9 +1,9 @@
 const schedule = require('node-schedule');
-const {sequelize, Order} = require('../models');
-const {Op} = require('sequelize');
+const { sequelize, Order } = require('../models');
+const { Op } = require('sequelize');
 const logger = require('../utils/logger');
 const moment = require('moment');
-const {producer} = require('../utils/rabbit-mq')
+const { producer } = require('../utils/rabbit-mq');
 
 /**
  * 定时检查并处理超时未支付订单
@@ -31,8 +31,8 @@ async function processExpiredOrders() {
           status: 0,
           // 筛选出创建时间早于当前时间一天前的订单，即超时未支付订单
           createdAt: {
-            [Op.lt]: moment().subtract(1, 'day').toDate()
-          }
+            [Op.lt]: moment().subtract(1, 'day').toDate(),
+          },
         },
         // 每页查询的记录数
         limit: pageSize,
@@ -41,7 +41,7 @@ async function processExpiredOrders() {
         // 将查询操作纳入当前事务
         transaction: t,
         // 使用排它锁，防止并发更新，保证数据一致性
-        lock: true
+        lock: true,
       });
 
       // 如果查询到的过期订单数量为 0，说明没有更多符合条件的数据了
@@ -54,22 +54,22 @@ async function processExpiredOrders() {
       }
 
       // 提取已超时订单的 ID 列表，方便后续批量操作
-      const orderIds = expiredOrders.map(order => order.id);
+      const orderIds = expiredOrders.map((order) => order.id);
 
       // 将订单 ID 发送到消息队列，以便后续异步处理
       // await sendMessageToQueue('expired_orders_queue', orderIds);
-      await producer('expired_orders_queue', orderIds)
+      await producer('expired_orders_queue', orderIds);
       // 批量更新超时订单的状态为 2（已取消（超时））
       await Order.update(
         {
-          status: 2,      // 订单状态：已取消（超时）
+          status: 2, // 订单状态：已取消（超时）
         },
         {
           where: {
-            id: orderIds
+            id: orderIds,
           },
           // 将更新操作纳入当前事务
-          transaction: t
+          transaction: t,
         }
       );
 

@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {Article} = require('../models');
-const {success, failure} = require('../utils/responses');
-const {NotFound} = require('http-errors');
-const {setKey, getKey} = require('../utils/redis');
+const { Article } = require('../models');
+const { success, failure } = require('../utils/responses');
+const { NotFound } = require('http-errors');
+const { setKey, getKey } = require('../utils/redis');
 /**
  * 查询文章列表
  * GET /articles
@@ -24,30 +24,28 @@ router.get('/', async function (req, res) {
     }
 
     const condition = {
-      attributes: {exclude: ['content']},
+      attributes: { exclude: ['content'] },
       order: [['id', 'DESC']],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     };
 
-    const {count, rows} = await Article.findAndCountAll(condition);
+    const { count, rows } = await Article.findAndCountAll(condition);
     data = {
       articles: rows,
       pagination: {
         total: count,
         currentPage,
         pageSize,
-      }
-    }
+      },
+    };
     await setKey(cacheKey, data);
 
     success(res, '查询文章列表成功。', data);
-  } catch
-    (error) {
+  } catch (error) {
     failure(res, error);
   }
-})
-;
+});
 
 /**
  * 查询文章详情
@@ -55,17 +53,17 @@ router.get('/', async function (req, res) {
  */
 router.get('/:id', async function (req, res) {
   try {
-    const {id} = req.params;
+    const { id } = req.params;
     let article = await getKey(`article:${id}`);
     if (!article) {
       article = await Article.findByPk(id);
       if (!article) {
-        throw new NotFound(`ID: ${id}的文章未找到。`)
+        throw new NotFound(`ID: ${id}的文章未找到。`);
       }
-      await setKey(`article:${id}`, article)
+      await setKey(`article:${id}`, article);
     }
 
-    success(res, '查询文章成功。', {article});
+    success(res, '查询文章成功。', { article });
   } catch (error) {
     failure(res, error);
   }

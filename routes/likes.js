@@ -22,22 +22,21 @@ router.post('/', async function (req, res) {
     const like = await Like.findOne({
       where: {
         courseId,
-        userId
-      }
+        userId,
+      },
     });
 
     // 如果没有点赞过，那就新增。并且课程的 likesCount + 1
     if (!like) {
       await Like.create({ courseId, userId });
       await course.increment('likesCount');
-      success(res, '点赞成功。')
+      success(res, '点赞成功。');
     } else {
       // 如果点赞过了，那就删除。并且课程的 likesCount - 1
       await like.destroy();
       await course.decrement('likesCount');
-      success(res, '取消赞成功。')
+      success(res, '取消赞成功。');
     }
-
   } catch (error) {
     failure(res, error);
   }
@@ -63,7 +62,7 @@ router.get('/', async function (req, res) {
       attributes: { exclude: ['CategoryId', 'UserId', 'content'] },
       order: [['id', 'DESC']],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     });
 
     // 查询当前用户点赞过的课程总数
@@ -75,7 +74,7 @@ router.get('/', async function (req, res) {
         total: count,
         currentPage,
         pageSize,
-      }
+      },
     });
   } catch (error) {
     failure(res, error);

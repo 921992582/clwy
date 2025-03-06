@@ -39,7 +39,7 @@ router.put('/', async function (req, res) {
 async function getSetting() {
   const setting = await Setting.findOne();
   if (!setting) {
-    throw new NotFound('初始系统设置未找到，请运行种子文件。')
+    throw new NotFound('初始系统设置未找到，请运行种子文件。');
   }
 
   return setting;
@@ -54,7 +54,7 @@ function filterBody(req) {
   return {
     name: req.body.name,
     icp: req.body.icp,
-    copyright: req.body.copyright
+    copyright: req.body.copyright,
   };
 }
 /**

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {Category, Course} = require('../../models');
-const {Op} = require('sequelize');
-const {NotFound, Conflict} = require('http-errors');
-const {success, failure} = require('../../utils/responses');
-const {delKey} = require('../../utils/redis');
+const { Category, Course } = require('../../models');
+const { Op } = require('sequelize');
+const { NotFound, Conflict } = require('http-errors');
+const { success, failure } = require('../../utils/responses');
+const { delKey } = require('../../utils/redis');
 /**
  * 查询分类列表
  * GET /admin/categories
@@ -15,12 +15,15 @@ router.get('/', async function (req, res) {
 
     const condition = {
       where: {},
-      order: [['rank', 'ASC'], ['id', 'ASC']],
+      order: [
+        ['rank', 'ASC'],
+        ['id', 'ASC'],
+      ],
     };
 
     if (query.name) {
       condition.where.name = {
-        [Op.like]: `%${query.name}%`
+        [Op.like]: `%${query.name}%`,
       };
     }
 
@@ -33,7 +36,6 @@ router.get('/', async function (req, res) {
   }
 });
 
-
 /**
  * 查询分类详情
  * GET /admin/categories/:id
@@ -41,7 +43,7 @@ router.get('/', async function (req, res) {
 router.get('/:id', async function (req, res) {
   try {
     const category = await getCategory(req);
-    success(res, '查询分类成功。', {category});
+    success(res, '查询分类成功。', { category });
   } catch (error) {
     failure(res, error);
   }
@@ -58,7 +60,7 @@ router.post('/', async function (req, res) {
     const category = await Category.create(body);
 
     await clearCache();
-    success(res, '创建分类成功。', {category}, 201);
+    success(res, '创建分类成功。', { category }, 201);
   } catch (error) {
     failure(res, error);
   }
@@ -75,7 +77,7 @@ router.put('/:id', async function (req, res) {
 
     await category.update(body);
     await clearCache(category);
-    success(res, '更新分类成功。', {category});
+    success(res, '更新分类成功。', { category });
   } catch (error) {
     failure(res, error);
   }
@@ -89,7 +91,7 @@ router.delete('/:id', async function (req, res) {
   try {
     const category = await getCategory(req);
 
-    const count = await Course.count({where: {categoryId: req.params.id}});
+    const count = await Course.count({ where: { categoryId: req.params.id } });
     if (count > 0) {
       throw new Conflict('当前分类有课程，无法删除。');
     }
@@ -106,11 +108,11 @@ router.delete('/:id', async function (req, res) {
  * 公共方法：查询当前分类
  */
 async function getCategory(req) {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const category = await Category.findByPk(id);
   if (!category) {
-    throw new NotFound(`ID: ${id}的分类未找到。`)
+    throw new NotFound(`ID: ${id}的分类未找到。`);
   }
 
   return category;
@@ -124,10 +126,9 @@ async function getCategory(req) {
 function filterBody(req) {
   return {
     name: req.body.name,
-    rank: req.body.rank
+    rank: req.body.rank,
   };
 }
-
 
 /**
  * 清除缓存

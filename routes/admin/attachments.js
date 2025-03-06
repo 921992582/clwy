@@ -21,12 +21,12 @@ router.get('/', async function (req, res) {
         {
           model: User,
           as: 'user',
-          attributes: ['id', 'username', 'avatar']
-        }
+          attributes: ['id', 'username', 'avatar'],
+        },
       ],
       order: [['id', 'DESC']],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     };
 
     const { count, rows } = await Attachment.findAndCountAll(condition);
@@ -35,8 +35,8 @@ router.get('/', async function (req, res) {
       pagination: {
         total: count,
         currentPage,
-        pageSize
-      }
+        pageSize,
+      },
     });
   } catch (error) {
     failure(res, error);
@@ -71,7 +71,7 @@ async function getAttachment(req) {
 
   const attachment = await Attachment.findByPk(id);
   if (!attachment) {
-    throw new NotFound(`ID: ${id}的附件未找到。`)
+    throw new NotFound(`ID: ${id}的附件未找到。`);
   }
 
   return attachment;

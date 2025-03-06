@@ -7,42 +7,41 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       courseId: {
         allowNull: false,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       title: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       content: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       video: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       rank: {
         allowNull: false,
         defaultValue: 1,
-        type: Sequelize.INTEGER.UNSIGNED
+        type: Sequelize.INTEGER.UNSIGNED,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
-    await queryInterface.addIndex(
-      'Chapters', {
-        fields: ['courseId']
-      });
+    await queryInterface.addIndex('Chapters', {
+      fields: ['courseId'],
+    });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Chapters');
-  }
+  },
 };

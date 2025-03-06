@@ -1,7 +1,7 @@
 const multer = require('multer');
 const MAO = require('multer-aliyun-oss');
-const OSS = require("ali-oss");
-const {BadRequest} = require('http-errors')
+const OSS = require('ali-oss');
+const { BadRequest } = require('http-errors');
 
 // 阿里云配置信息
 const config = {
@@ -17,7 +17,7 @@ const client = new OSS(config);
 const upload = multer({
   storage: MAO({
     config: config,
-    destination: 'uploads'  // 自定义上传目录
+    destination: 'uploads', // 自定义上传目录
   }),
   limits: {
     fileSize: 5 * 1024 * 1024, // 限制上传文件的大小为：5MB
@@ -32,7 +32,7 @@ const upload = multer({
     }
 
     cb(null, true);
-  }
+  },
 });
 
 //  单文件上传，指定表单字段名为 file
@@ -43,5 +43,5 @@ module.exports = {
   config,
   client,
   singleFileUpload,
-  multipleFilesUpload
-}
+  multipleFilesUpload,
+};

@@ -1,5 +1,4 @@
-const {AlipaySdk} = require('alipay-sdk');
-
+const { AlipaySdk } = require('alipay-sdk');
 
 const alipaySdk = new AlipaySdk({
   appId: process.env.ALIPAY_APPID,

@@ -1,4 +1,4 @@
-const {createClient} = require('redis');
+const { createClient } = require('redis');
 const logger = require('./logger');
 
 // 创建全局的 Redis 客户端实例
@@ -14,7 +14,7 @@ const redisClient = async () => {
     url: 'redis://47.108.67.229:6379',
     password: 'xiewei5036921',
   })
-    .on('error', err => logger.error('Redis 连接失败', err))
+    .on('error', (err) => logger.error('Redis 连接失败', err))
     .connect();
 };
 
@@ -64,7 +64,7 @@ const delKey = async (key) => {
 const getKeysByPattern = async (pattern) => {
   if (!client) await redisClient();
   return await client.keys(pattern);
-}
+};
 
 /**
  * 清空所有缓存数据
@@ -73,7 +73,6 @@ const getKeysByPattern = async (pattern) => {
 const flushAll = async () => {
   if (!client) await redisClient();
   await client.flushAll();
-}
+};
 
-module.exports = {redisClient, setKey, getKey, delKey, getKeysByPattern, flushAll};
-
+module.exports = { redisClient, setKey, getKey, delKey, getKeysByPattern, flushAll };

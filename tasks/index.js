@@ -1,5 +1,5 @@
 const scheduleOrderCheck = require('./check-order');
-const scheduleMembershipCheck  = require('./check-membership');
+const scheduleMembershipCheck = require('./check-membership');
 const logger = require('../utils/logger');
 
 /**

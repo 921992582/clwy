@@ -18,7 +18,7 @@ router.get('/sex', async function (req, res) {
     const data = [
       { value: male, name: '男性' },
       { value: female, name: '女性' },
-      { value: unknown, name: '未选择' }
+      { value: unknown, name: '未选择' },
     ];
 
     success(res, '查询用户性别成功。', { data });
@@ -33,14 +33,16 @@ router.get('/sex', async function (req, res) {
  */
 router.get('/user', async (req, res) => {
   try {
-    const [results] = await sequelize.query("SELECT DATE_FORMAT(`createdAt`, '%Y-%m') AS `month`, COUNT(*) AS `value` FROM `Users` GROUP BY `month` ORDER BY `month` ASC");
+    const [results] = await sequelize.query(
+      "SELECT DATE_FORMAT(`createdAt`, '%Y-%m') AS `month`, COUNT(*) AS `value` FROM `Users` GROUP BY `month` ORDER BY `month` ASC"
+    );
 
     const data = {
       months: [],
       values: [],
     };
 
-    results.forEach(item => {
+    results.forEach((item) => {
       data.months.push(item.month);
       data.values.push(item.value);
     });
@@ -50,6 +52,5 @@ router.get('/user', async (req, res) => {
     failure(res, error);
   }
 });
-
 
 module.exports = router;

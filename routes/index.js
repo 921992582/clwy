@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {Course, Category, User} = require('../models');
-const {success, failure} = require('../utils/responses');
-const {setKey, getKey} = require('../utils/redis');
+const { Course, Category, User } = require('../models');
+const { success, failure } = require('../utils/responses');
+const { setKey, getKey } = require('../utils/redis');
 /**
  * 查询首页数据
  * GET /
@@ -18,47 +18,48 @@ router.get('/', async function (req, res, next) {
     const [recommendedCourses, likesCourses, introductoryCourses] = await Promise.all([
       // 焦点图（推荐的课程）
       Course.findAll({
-        attributes: {exclude: ['CategoryId', 'UserId', 'content']},
+        attributes: { exclude: ['CategoryId', 'UserId', 'content'] },
         include: [
           {
             model: Category,
             as: 'category',
-            attributes: ['id', 'name']
+            attributes: ['id', 'name'],
           },
           {
             model: User,
             as: 'user',
             attributes: ['id', 'username', 'nickname', 'avatar', 'company'],
-          }
+          },
         ],
-        where: {recommended: true},
+        where: { recommended: true },
         order: [['id', 'desc']],
-        limit: 10
+        limit: 10,
       }),
 
       Course.findAll({
-        attributes: {exclude: ['CategoryId', 'UserId', 'content']},
-        order: [['likesCount', 'desc'], ['id', 'desc']],
-        limit: 10
+        attributes: { exclude: ['CategoryId', 'UserId', 'content'] },
+        order: [
+          ['likesCount', 'desc'],
+          ['id', 'desc'],
+        ],
+        limit: 10,
       }),
 
       // 入门课程
       Course.findAll({
-        attributes: {exclude: ['CategoryId', 'UserId', 'content']},
-        where: {introductory: true},
+        attributes: { exclude: ['CategoryId', 'UserId', 'content'] },
+        where: { introductory: true },
         order: [['id', 'desc']],
-        limit: 10
-      })
-
-    ])
-
+        limit: 10,
+      }),
+    ]);
 
     // 组装数据
     data = {
       recommendedCourses,
       likesCourses,
-      introductoryCourses
-    }
+      introductoryCourses,
+    };
 
     // 设置缓存过期时间，为10秒钟
     await setKey('index', data, 30 * 60);

@@ -16,7 +16,7 @@ module.exports = {
         role: 100,
         membershipExpiredAt: moment().add(1, 'year').toDate(),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         email: 'user1@clwy.cn',
@@ -27,7 +27,7 @@ module.exports = {
         role: 0,
         membershipExpiredAt: moment().add(1, 'year').toDate(),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         email: 'user2@clwy.cn',
@@ -38,7 +38,7 @@ module.exports = {
         role: 0,
         membershipExpiredAt: moment().add(1, 'year').toDate(),
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       {
         email: 'user3@clwy.cn',
@@ -49,16 +49,20 @@ module.exports = {
         role: 1,
         membershipExpiredAt: moment().add(1, 'year').toDate(),
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ];
 
     for (const user of users) {
-      const existingUser = await queryInterface.rawSelect('Users', {
-        where: {
-          email: user.email
-        }
-      }, ['id']);
+      const existingUser = await queryInterface.rawSelect(
+        'Users',
+        {
+          where: {
+            email: user.email,
+          },
+        },
+        ['id']
+      );
 
       if (!existingUser) {
         await queryInterface.insert('Users', user);
@@ -68,5 +72,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Users', null, {});
-  }
+  },
 };

@@ -20,12 +20,12 @@ module.exports = async (req, res, next) => {
     // 查询一下，当前用户
     const user = await User.findByPk(userId);
     if (!user) {
-      throw new Unauthorized('用户不存在。')
+      throw new Unauthorized('用户不存在。');
     }
 
     // 验证当前用户是否是管理员
     if (user.role !== 100) {
-      throw new Unauthorized('您没有权限使用当前接口。')
+      throw new Unauthorized('您没有权限使用当前接口。');
     }
 
     // 如果通过验证，将 user 对象挂载到 req 上，方便后续中间件或路由使用

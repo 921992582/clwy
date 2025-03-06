@@ -1,8 +1,6 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-const moment = require("moment");
+const { Model } = require('sequelize');
+const moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
   class Setting extends Model {
@@ -15,25 +13,28 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  Setting.init({
-    name: DataTypes.STRING,
-    icp: DataTypes.STRING,
-    copyright: DataTypes.STRING,
-    createdAt: {
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue("createdAt")).format("LL");
-      }
+  Setting.init(
+    {
+      name: DataTypes.STRING,
+      icp: DataTypes.STRING,
+      copyright: DataTypes.STRING,
+      createdAt: {
+        type: DataTypes.DATE,
+        get() {
+          return moment(this.getDataValue('createdAt')).format('LL');
+        },
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        get() {
+          return moment(this.getDataValue('updatedAt')).format('LL');
+        },
+      },
     },
-    updatedAt: {
-      type: DataTypes.DATE,
-      get() {
-        return moment(this.getDataValue("updatedAt")).format("LL");
-      }
+    {
+      sequelize,
+      modelName: 'Setting',
     }
-  }, {
-    sequelize,
-    modelName: 'Setting',
-  });
+  );
   return Setting;
 };

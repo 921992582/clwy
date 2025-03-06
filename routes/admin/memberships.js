@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {Membership} = require('../../models');
-const {Op} = require('sequelize');
-const {NotFound} = require('http-errors');
-const {success, failure} = require('../../utils/responses');
-const {delKey} = require('../../utils/redis');
+const { Membership } = require('../../models');
+const { Op } = require('sequelize');
+const { NotFound } = require('http-errors');
+const { success, failure } = require('../../utils/responses');
+const { delKey } = require('../../utils/redis');
 
 /**
  * 查询大会员列表
@@ -16,12 +16,15 @@ router.get('/', async function (req, res) {
 
     const condition = {
       where: {},
-      order: [['rank', 'ASC'], ['id', 'ASC']],
+      order: [
+        ['rank', 'ASC'],
+        ['id', 'ASC'],
+      ],
     };
 
     if (query.name) {
       condition.where.name = {
-        [Op.like]: `%${query.name}%`
+        [Op.like]: `%${query.name}%`,
       };
     }
 
@@ -34,7 +37,6 @@ router.get('/', async function (req, res) {
   }
 });
 
-
 /**
  * 查询大会员详情
  * GET /admin/memberships/:id
@@ -42,7 +44,7 @@ router.get('/', async function (req, res) {
 router.get('/:id', async function (req, res) {
   try {
     const membership = await getMembership(req);
-    success(res, '查询大会员成功。', {membership});
+    success(res, '查询大会员成功。', { membership });
   } catch (error) {
     failure(res, error);
   }
@@ -59,7 +61,7 @@ router.post('/', async function (req, res) {
     const membership = await Membership.create(body);
     await clearCache();
 
-    success(res, '创建大会员成功。', {membership}, 201);
+    success(res, '创建大会员成功。', { membership }, 201);
   } catch (error) {
     failure(res, error);
   }
@@ -77,7 +79,7 @@ router.put('/:id', async function (req, res) {
     await membership.update(body);
     await clearCache(membership);
 
-    success(res, '更新大会员成功。', {membership: membership});
+    success(res, '更新大会员成功。', { membership: membership });
   } catch (error) {
     failure(res, error);
   }
@@ -103,11 +105,11 @@ router.delete('/:id', async function (req, res) {
  * 公共方法：查询当前大会员
  */
 async function getMembership(req) {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const membership = await Membership.findByPk(id);
   if (!membership) {
-    throw new NotFound(`ID: ${id}的大会员未找到。`)
+    throw new NotFound(`ID: ${id}的大会员未找到。`);
   }
 
   return membership;
@@ -124,7 +126,7 @@ function filterBody(req) {
     durationMonths: req.body.durationMonths,
     price: req.body.price,
     rank: req.body.rank,
-    description: req.body.description
+    description: req.body.description,
   };
 }
 

@@ -1,7 +1,5 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Game extends Model {
     /**
@@ -14,27 +12,26 @@ module.exports = (sequelize, DataTypes) => {
       models.Game.belongsToMany(models.GameUser, {
         through: models.GameGrade,
         foreignKey: 'gameId',
-        as: 'GameGradesGame'
-      })
+        as: 'GameGradesGame',
+      });
     }
   }
 
-  Game.init({
+  Game.init(
+    {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notNull: {msg: '游戏名称必须填写。'},
-          notEmpty: {msg: '游戏名称不能为空。'},
+          notNull: { msg: '游戏名称必须填写。' },
+          notEmpty: { msg: '游戏名称不能为空。' },
         },
       },
     },
     {
       sequelize,
-      modelName:
-        'Game',
+      modelName: 'Game',
     }
-  )
-  ;
+  );
   return Game;
 };

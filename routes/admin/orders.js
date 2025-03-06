@@ -20,7 +20,7 @@ router.get('/', async function (req, res) {
       where: {},
       order: [['id', 'DESC']],
       limit: pageSize,
-      offset: offset
+      offset: offset,
     };
 
     if (query.userId) {
@@ -46,7 +46,7 @@ router.get('/', async function (req, res) {
         total: count,
         currentPage,
         pageSize,
-      }
+      },
     });
   } catch (error) {
     failure(res, error);
@@ -77,10 +77,10 @@ function getCondition() {
       {
         model: User,
         as: 'user',
-        attributes: ['id', 'username', 'avatar']
-      }
-    ]
-  }
+        attributes: ['id', 'username', 'avatar'],
+      },
+    ],
+  };
 }
 
 /**
@@ -95,7 +95,7 @@ async function getOrder(req) {
   });
 
   if (!order) {
-    throw new NotFound(`订单号: ${outTradeNo} 的订单未找到。`)
+    throw new NotFound(`订单号: ${outTradeNo} 的订单未找到。`);
   }
 
   return order;

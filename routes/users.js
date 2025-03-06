@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {User} = require('../models');
-const {success, failure} = require('../utils/responses');
-const {BadRequest, NotFound} = require('http-errors');
+const { User } = require('../models');
+const { success, failure } = require('../utils/responses');
+const { BadRequest, NotFound } = require('http-errors');
 const bcrypt = require('bcryptjs');
-const {setKey, getKey, delKey} = require('../utils/redis');
+const { setKey, getKey, delKey } = require('../utils/redis');
 /**
  * 查询当前登录用户详情
  * GET /users/me
@@ -14,10 +14,10 @@ router.get('/me', async function (req, res) {
     let user = await getKey(`user:${req.userId}`);
     if (!user) {
       user = await getUser(req);
-      await setKey(`user:${req.userId}`, user)
+      await setKey(`user:${req.userId}`, user);
     }
 
-    success(res, '查询当前用户信息成功。', {user});
+    success(res, '查询当前用户信息成功。', { user });
   } catch (error) {
     failure(res, error);
   }
@@ -34,13 +34,13 @@ router.put('/info', async function (req, res) {
       sex: req.body.sex,
       company: req.body.company,
       introduce: req.body.introduce,
-      avatar: req.body.avatar
+      avatar: req.body.avatar,
     };
 
     const user = await getUser(req);
     await user.update(body);
     await clearCache(user);
-    success(res, '更新用户信息成功。', {user});
+    success(res, '更新用户信息成功。', { user });
   } catch (error) {
     failure(res, error);
   }
@@ -57,7 +57,7 @@ router.put('/account', async function (req, res) {
       username: req.body.username,
       current_password: req.body.current_password,
       password: req.body.password,
-      passwordConfirmation: req.body.passwordConfirmation
+      passwordConfirmation: req.body.passwordConfirmation,
     };
 
     if (!body.current_password) {
@@ -82,7 +82,7 @@ router.put('/account', async function (req, res) {
     // 删除密码
     delete user.dataValues.password;
     await clearCache(user);
-    success(res, '更新账户信息成功。', {user});
+    success(res, '更新账户信息成功。', { user });
   } catch (error) {
     failure(res, error);
   }
@@ -100,18 +100,17 @@ async function getUser(req, showPassword = false) {
   let condition = {};
   if (!showPassword) {
     condition = {
-      attributes: {exclude: ['password']},
+      attributes: { exclude: ['password'] },
     };
   }
 
   const user = await User.findByPk(id, condition);
   if (!user) {
-    throw new NotFound(`ID: ${id}的用户未找到。`)
+    throw new NotFound(`ID: ${id}的用户未找到。`);
   }
 
   return user;
 }
-
 
 /**
  * 清除缓存

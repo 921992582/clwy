@@ -1,5 +1,5 @@
 require('dotenv').config();
-const {consumeExpiredOrders} = require('./rabbit-mq');
+const { consumeExpiredOrders } = require('./rabbit-mq');
 
 const logger = require('./logger');
 // 封装启动消费者的函数，方便后续扩展和错误处理

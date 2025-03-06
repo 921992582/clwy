@@ -13,7 +13,10 @@ router.get('/', async function (req, res, next) {
     let memberships = await getKey('memberships');
     if (!memberships) {
       memberships = await Membership.findAll({
-        order: [['rank', 'ASC'], ['id', 'DESC']]
+        order: [
+          ['rank', 'ASC'],
+          ['id', 'DESC'],
+        ],
       });
       await setKey('memberships', memberships);
     }
