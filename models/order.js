@@ -30,6 +30,11 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    version: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     createdAt: {
       type: DataTypes.DATE,
       get() {
@@ -45,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Order',
+    // version: true, // 乐观锁
   });
   return Order;
 };

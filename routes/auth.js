@@ -9,7 +9,7 @@ const {Op} = require('sequelize');
 const validateCaptcha = require('../middlewares/validate-captcha');
 const {delKey} = require('../utils/redis');
 const sendMail = require('../utils/mail');
-const {mailProducer} = require('../utils/rabbit-mq');
+const {producer} = require('../utils/rabbit-mq');
 /**
  * 用户注册
  * POST /auth/sign_up
@@ -40,7 +40,7 @@ router.post('/sign_up', validateCaptcha, async function (req, res) {
         xw
       `,
     };
-    await mailProducer(msg);
+    await producer('mail_queue', msg);
 
     success(res, '创建用户成功。', {user}, 201);
   } catch (error) {

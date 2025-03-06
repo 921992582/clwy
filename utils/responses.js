@@ -33,6 +33,9 @@ function failure(res, error) {
   if (error.name === 'SequelizeValidationError') {      // Sequelize 验证错误
     statusCode = 400;
     errors = error.errors.map(e => e.message);
+  } else if (error.name === 'SequelizeOptimisticLockError') {
+    statusCode = 409;
+    errors = '请求冲突，您提交的数据已被修改，请稍后重试。';
   } else if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {  // Token 验证错误
     statusCode = 401;
     errors = '您提交的 token 错误或已过期。';

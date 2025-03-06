@@ -7,6 +7,10 @@ require('dotenv').config();
 
 const adminAuth = require('./middlewares/admin-auth');
 const userAuth = require('./middlewares/user-auth');
+// 启动定时任务
+const initScheduleTasks = require('./tasks');
+initScheduleTasks();
+
 
 // 前台路由文件
 const indexRouter = require('./routes/index');

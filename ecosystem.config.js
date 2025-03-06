@@ -22,6 +22,16 @@ module.exports = {
       env_production: {
         NODE_ENV: "production"
       }
+    }, {
+      name: "order-consumer",
+      script: "./utils/order-consumer.js",
+      interpreter: "node",
+      env: {
+        NODE_ENV: "development"
+      },
+      env_production: {
+        NODE_ENV: "production"
+      }
     }
   ]
 };

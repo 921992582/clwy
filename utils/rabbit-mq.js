@@ -1,6 +1,7 @@
 const amqp = require('amqplib');
 const sendMail = require('./mail');
 const logger = require('./logger');
+const {sequelize, Order} = require("../models");
 
 // 创建全局的 RabbitMQ 连接和通道
 let connection;
@@ -27,7 +28,7 @@ const connectWithRetry = async (url, retries = 5, delay = 5000) => {
  * 连接到 RabbitMQ
  * @returns {Promise<*>}
  */
-const connectToRabbitMQ = async () => {
+const connectToRabbitMQ = async (queueName) => {
   if (connection && channel) return;
 
   try {
@@ -46,7 +47,7 @@ const connectToRabbitMQ = async () => {
       logger.error('RabbitMQ 连接发生错误:', err);
     });
 
-    await channel.assertQueue('mail_queue', {durable: true});
+    await channel.assertQueue(queueName, {durable: true});
   } catch (error) {
     logger.error('RabbitMQ 连接失败：', error);
     throw error;
@@ -56,13 +57,13 @@ const connectToRabbitMQ = async () => {
 /**
  * 邮件队列生产者（发送消息）
  */
-const mailProducer = async (msg) => {
+const producer = async (queueName, msg) => {
   try {
-    await connectToRabbitMQ(); // 确保已连接
+    await connectToRabbitMQ(queueName); // 确保已连接
 
     // 消息持久化设置，提高消息可靠性
     const options = {persistent: true};
-    const sent = channel.sendToQueue('mail_queue', Buffer.from(JSON.stringify(msg)), options);
+    const sent = channel.sendToQueue(queueName, Buffer.from(JSON.stringify(msg)), options);
     if (!sent) {
       logger.warn('消息未能立即入队，等待下次机会');
     }
@@ -72,12 +73,13 @@ const mailProducer = async (msg) => {
   }
 };
 
+
 /**
  * 邮件队列消费者（接收消息）
  */
 const mailConsumer = async () => {
   try {
-    await connectToRabbitMQ();
+    await connectToRabbitMQ('mail_queue');
 
     // 消费消息时，手动确认消息，避免消息丢失
     channel.consume('mail_queue', async (msg) => {
@@ -100,7 +102,53 @@ const mailConsumer = async () => {
   }
 };
 
+/**
+ * 过期订单队列消费者（接收消息）
+ * @returns {Promise<void>}
+ */
+async function consumeExpiredOrders() {
+  try {
+    await connectToRabbitMQ('expired_orders_queue');
+    channel.consume('expired_orders_queue', async (msg) => {
+        if (msg) {
+          const orderIds = JSON.parse(msg.content.toString());
+          const t = await sequelize.transaction();
+          try {
+            // 批量更新超时订单状态
+            await Order.update(
+              {
+                status: 2,      // 订单状态：已取消（超时）
+              },
+              {
+                where: {
+                  id: orderIds
+                },
+                transaction: t
+              }
+            );
+            await t.commit();
+            channel.ack(msg);
+            console.log(`成功处理 ${orderIds.length} 个过期订单`);
+
+            logger.info('过期订单消费者已开始监听');
+
+          } catch (error) {
+            await t.rollback();
+            logger.error('处理过期订单时出错：', error);
+            channel.nack(msg);
+          }
+        }
+      }
+    )
+    ;
+  } catch (error) {
+    console.error('消费过期订单消息时出错:', error);
+  }
+}
+
 module.exports = {
-  mailProducer,
+  producer,
   mailConsumer,
+  consumeExpiredOrders
+
 };
