@@ -20,6 +20,9 @@ const captchaRouter = require('../routes/captcha');
 const membershipsRouter = require('../routes/memberships');
 const ordersRouter = require('../routes/orders');
 const alipayRouter = require('../routes/alipay');
+
+
+const wechatRouter = require('../routes/wechat/index');
 // 后台路由文件
 const adminArticlesRouter = require('../routes/admin/articles');
 const adminCategoriesRouter = require('../routes/admin/categories');
@@ -54,7 +57,7 @@ router.use('/memberships', membershipsRouter);
 router.use('/alipay', alipayRouter);
 
 router.use('/game', Game);
-
+router.use('/wechat', wechatRouter);
 router.use('/captcha', captchaRouter);
 
 // 后台路由配置

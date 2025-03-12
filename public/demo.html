@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- 让页面在移动设备上能正确显示 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实时统计图表</title>
+  <!-- 引入 ECharts 库，用于创建各种类型的图表 -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <!-- 引入自定义的图表管理脚本，包含 ChartManager 类等逻辑 -->
+  <script src="charts.js"></script>
+  <style>
+    body {
+      /* 设置页面整体字体为 Arial 无衬线字体 */
+      font-family: Arial, sans-serif;
+      /* 使用 Flexbox 布局，让内容水平和垂直居中 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* 让内容垂直排列 */
+      flex-direction: column;
+      /* 页面四周添加 20px 的外边距 */
+      margin: 20px;
+    }
+
+    .chart-container {
+      /* 设置图表容器的宽度为 800px */
+      width: 800px;
+      /* 设置图表容器的高度为 500px */
+      height: 500px;
+      /* 图表容器四周添加 20px 的外边距 */
+      margin: 20px;
+      /* 图表容器添加 1px 宽的浅灰色边框 */
+      border: 1px solid #eee;
+      /* 图表容器四个角设置 4px 的圆角 */
+      border-radius: 4px;
+    }
+
+    .error-message {
+      /* 错误消息文本颜色设置为红色 */
+      color: red;
+      /* 错误消息四周添加 20px 的外边距 */
+      margin: 20px;
+      /* 错误消息内容四周添加 10px 的内边距 */
+      padding: 10px;
+      /* 错误消息背景颜色设置为浅红色 */
+      background-color: #ffebee;
+      /* 错误消息框四个角设置 4px 的圆角 */
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+<!-- 订单统计图表的容器，后续 ECharts 图表会渲染到这个容器中 -->
+<div class="chart-container" id="orderChart"></div>
+<!-- 用户统计图表的容器，后续 ECharts 图表会渲染到这个容器中 -->
+<div class="chart-container" id="userChart"></div>
+<script>
+  // 当文档的 DOM 内容加载完成后执行以下逻辑
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // 这里的 token 用于身份验证，实际使用时需要替换为从后端获取的真实 token
+      const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc0MTU5MDkzMiwiZXhwIjoxNzQ0MTgyOTMyfQ.oF-QaiCSIU2X1wm03hPaRewFX55-jR29mxQ9R-IV7to';
+
+      // 自定义的 ECharts 配置选项，可用于覆盖默认配置
+      const customOption = {
+        // 修改图表标题的文本颜色为蓝色
+        title: {
+          textStyle: { color: 'blue' }
+        }
+      };
+
+      // 创建订单统计图表的管理实例，传入容器 ID、图表类型、token 和自定义配置
+      const orderChart = new ChartManager('orderChart', 'order', token, customOption);
+      // 创建用户统计图表的管理实例，传入容器 ID、图表类型、token 和自定义配置
+      const userChart = new ChartManager('userChart', 'user', token, customOption);
+
+      // 使用 Promise.all 并行初始化订单图表和用户图表
+      await Promise.all([orderChart.init(), userChart.init()]);
+
+      // 监听窗口的 beforeunload 事件，当用户关闭或刷新页面时执行以下逻辑
+      window.addEventListener('beforeunload', () => {
+        // 销毁订单图表实例，释放相关资源
+        orderChart.destroy();
+        // 销毁用户图表实例，释放相关资源
+        userChart.destroy();
+      });
+    } catch (error) {
+      // 如果在初始化过程中出现错误，在控制台输出错误信息
+      console.error('图表初始化失败:', error);
+      // 调用 showGlobalError 函数显示全局错误消息
+      showGlobalError('图表初始化失败，请检查浏览器控制台');
+    }
+  });
+
+  /**
+   * 显示全局错误消息的函数
+   * @param {string} message - 要显示的错误消息内容
+   */
+  function showGlobalError(message) {
+    // 创建一个新的 div 元素用于显示错误消息
+    const errorDiv = document.createElement('div');
+    // 为错误消息 div 元素添加 error-message 类名，以便应用相应的样式
+    errorDiv.className = 'error-message';
+    // 设置错误消息 div 元素的文本内容为传入的消息
+    errorDiv.textContent = message;
+    // 将错误消息 div 元素添加到页面 body 元素的最前面
+    document.body.prepend(errorDiv);
+  }
+</script>
+</body>
+
+</html>

@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models');
-const { success, failure } = require('../utils/responses');
-const { NotFound, BadRequest, Unauthorized } = require('http-errors');
+const {User} = require('../models');
+const {success, failure} = require('../utils/responses');
+const {NotFound, BadRequest, Unauthorized} = require('http-errors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Op } = require('sequelize');
+const {Op} = require('sequelize');
 const validateCaptcha = require('../middlewares/validate-captcha');
-const { delKey } = require('../utils/redis');
+const {delKey} = require('../utils/redis');
 const sendMail = require('../utils/mail');
-const { producer } = require('../utils/rabbit-mq');
+const {producer} = require('../utils/rabbit-mq');
 /**
  * 用户注册
  * POST /auth/sign_up
@@ -29,6 +29,7 @@ router.post('/sign_up', validateCaptcha, async function (req, res) {
     delete user.dataValues.password; // 删除密码
     // 请求成功，删除验证码，防止重复使用
     await delKey(req.body.captchaKey);
+    await delKey('stats_data_user')
 
     // 将邮件发送请求放入队列
     const msg = {
@@ -42,7 +43,7 @@ router.post('/sign_up', validateCaptcha, async function (req, res) {
     };
     await producer('mail_queue', msg);
 
-    success(res, '创建用户成功。', { user }, 201);
+    success(res, '创建用户成功。', {user}, 201);
   } catch (error) {
     failure(res, error);
   }
@@ -54,7 +55,7 @@ router.post('/sign_up', validateCaptcha, async function (req, res) {
  */
 router.post('/sign_in', async (req, res) => {
   try {
-    const { login, password } = req.body;
+    const {login, password} = req.body;
 
     if (!login) {
       throw new BadRequest('邮箱/用户名必须填写。');
@@ -66,7 +67,7 @@ router.post('/sign_in', async (req, res) => {
 
     const condition = {
       where: {
-        [Op.or]: [{ email: login }, { username: login }],
+        [Op.or]: [{email: login}, {username: login}],
       },
     };
 
@@ -88,9 +89,9 @@ router.post('/sign_in', async (req, res) => {
         userId: user.id,
       },
       process.env.SECRET,
-      { expiresIn: '30d' }
+      {expiresIn: '30d'}
     );
-    success(res, '登录成功。', { token });
+    success(res, '登录成功。', {token});
   } catch (error) {
     failure(res, error);
   }

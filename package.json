@@ -11,6 +11,7 @@
     "ali-oss": "^6.21.0",
     "alipay-sdk": "^4.13.0",
     "amqplib": "^0.10.5",
+    "axios": "^1.8.2",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -30,6 +31,7 @@
     "redis": "^4.7.0",
     "sequelize": "^6.37.3",
     "svg-captcha": "^1.4.0",
+    "tenpay": "^2.1.18",
     "uuid": "^10.0.0",
     "winston": "^3.17.0",
     "winston-mysql": "^1.1.1"
